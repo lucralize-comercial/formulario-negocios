@@ -376,10 +376,10 @@ function onStatusChange() {
 async function agendorFetch(path, method = 'GET', body = null) {
   const opts = {
     method,
-    headers: { 'Authorization': `Token ${API_TOKEN}`, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
   };
   if (body) opts.body = JSON.stringify(body);
-  const r = await fetch('https://api.agendor.com.br/v3' + path, opts);
+  const r = await fetch('https://web-production-c01f6.up.railway.app/agendor' + path, opts);
   const json = await r.json();
   if (!r.ok) throw new Error(json.message || JSON.stringify(json));
   return json;
