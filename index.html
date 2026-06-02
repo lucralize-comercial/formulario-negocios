@@ -247,6 +247,10 @@ body {
         <label>Telefone</label>
         <input type="tel" id="telefone" placeholder="(00) 00000-0000">
       </div>
+      <div class="field">
+        <label>WhatsApp</label>
+        <input type="tel" id="whatsapp" placeholder="(00) 00000-0000">
+      </div>
     </div>
   </div>
 
@@ -273,7 +277,7 @@ body {
       </div>
       <div class="field">
         <label>Valor do negócio (R$)</label>
-        <input type="number" id="valor" placeholder="0,00" min="0" step="0.01">
+        <input type="text" id="valor" placeholder="0,00" inputmode="numeric">
       </div>
     </div>
     <div class="grid-2 mb">
@@ -285,16 +289,16 @@ body {
           <option value="2">Perdido</option>
         </select>
       </div>
-      <div class="field" id="field_conclusao">
-        <label id="label_conclusao">Data de conclusão</label>
-        <input type="date" id="data_conclusao">
-        <span class="field-hint" id="hint_conclusao">Obrigatória para negócios ganhos ou perdidos.</span>
-      </div>
     </div>
     <div class="grid-2 mb">
       <div class="field">
         <label>Data de início</label>
         <input type="date" id="data_inicio">
+      </div>
+      <div class="field" id="field_conclusao">
+        <label id="label_conclusao">Data de conclusão</label>
+        <input type="date" id="data_conclusao">
+        <span class="field-hint" id="hint_conclusao">Obrigatória para negócios ganhos ou perdidos.</span>
       </div>
     </div>
     <div class="grid-1">
@@ -331,6 +335,44 @@ const ICONS = {
 };
 
 // Máscara CNPJ
+document.getElementById('valor').addEventListener('blur', function(e) {
+  const raw = e.target.value.replace(/\D/g, '');
+  if (!raw) return;
+  const num = parseFloat(raw) / 100;
+  e.target.value = num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+});
+
+document.getElementById('valor').addEventListener('focus', function(e) {
+  const raw = e.target.value.replace(/\./g, '').replace(',', '.');
+  const num = parseFloat(raw);
+  e.target.value = isNaN(num) ? '' : String(Math.round(num * 100));
+});
+
+document.getElementById('empresa').addEventListener('blur', function(e) {
+  const titulo = document.getElementById('titulo');
+  if (!titulo.value.trim()) {
+    titulo.value = e.target.value.trim();
+  }
+});
+
+document.getElementById('whatsapp').addEventListener('input', function(e) {
+  let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+  else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+  else if (v.length > 0) v = v.replace(/^(\d{0,2})/, '($1');
+  e.target.value = v;
+});
+
+document.getElementById('telefone').addEventListener('input', function(e) {
+  let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+  else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+  else if (v.length > 0) v = v.replace(/^(\d{0,2})/, '($1');
+  e.target.value = v;
+});
+
 document.getElementById('cnpj').addEventListener('input', function(e) {
   let v = e.target.value.replace(/\D/g, '').slice(0, 14);
   if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
@@ -388,10 +430,19 @@ async function agendorFetch(path, method = 'GET', body = null) {
 async function loadFunnels() {
   try {
     const res = await agendorFetch('/funnels');
-    (res.data || res).forEach(f => {
-      if (funnelData[f.acronym] !== undefined || ['LGL','JUR','REG'].includes(f.acronym))
-        funnelData[f.acronym] = f;
-    });
+    const list = res.data || res;
+    for (const f of list) {
+      if (['LGL','JUR','REG'].includes(f.acronym)) {
+        funnelData[f.acronym] = { ...f, closingSequence: null };
+        try {
+          const stagesRes = await agendorFetch('/deal_stages?funnel=' + f.id);
+          const stages = stagesRes.data || stagesRes;
+          const closing = stages.find(s => s.name && s.name.toLowerCase().includes('fechamento'));
+          if (closing) funnelData[f.acronym].closingSequence = closing.sequence;
+          else if (stages.length) funnelData[f.acronym].closingSequence = stages[stages.length - 1].sequence;
+        } catch(e) { console.warn('Etapas:', e); }
+      }
+    }
   } catch(e) { console.warn('Funis:', e); }
 }
 
@@ -430,7 +481,7 @@ async function buscarOuCriarOrganizacao(nome, cnpj) {
     const search = await agendorFetch(`/organizations?q=${encodeURIComponent(nome)}&per_page=5`);
     const lista  = search.data || search;
     if (lista.length > 0) return lista[0].id;
-    const payload = { name: nome };
+    const payload = { name: nome, legalName: nome };
     if (cnpj) payload.cnpj = cnpj.replace(/\D/g, '');
     const created = await agendorFetch('/organizations', 'POST', payload);
     return created.data?.id || null;
@@ -484,9 +535,8 @@ async function enviarNegocio() {
   document.getElementById('btn-label').textContent = 'Enviando...';
 
   try {
-    const funil   = funnelData[selectedFunnel];
-    const stages  = funil?.stages || [];
-    const stageId = (stages[FUNNELS[selectedFunnel].stageIndex] || stages[stages.length - 1])?.id;
+    const funil    = funnelData[selectedFunnel];
+    const stageId  = funil?.closingSequence || null;
 
     const payload = {
       title:    titulo,
@@ -501,9 +551,6 @@ async function enviarNegocio() {
     if (orgId) payload.organizationId = orgId;
 
     // Campos opcionais
-    const valor = document.getElementById('valor').value;
-    if (valor) payload.value = parseFloat(valor);
-
     const dataInicio = document.getElementById('data_inicio').value;
     if (dataInicio)    payload.startDate   = dataInicio;
     if (dataConclusao) payload.closingDate = dataConclusao;
@@ -524,8 +571,12 @@ async function enviarNegocio() {
     if (pessoa || telefone || email) {
       try {
         const pPayload = { name: pessoa || empresa };
-        if (telefone) pPayload.phone = telefone;
-        if (email)    pPayload.email = email;
+        const whatsapp = document.getElementById('whatsapp').value.trim();
+        const contact = {};
+        if (telefone) contact.phone = telefone;
+        if (whatsapp) contact.whatsapp = whatsapp;
+        if (email)    contact.email = email;
+        if (Object.keys(contact).length) pPayload.contact = contact;
         if (orgId)    pPayload.organizationId = orgId;
         const pRes = await agendorFetch('/people', 'POST', pPayload);
         const pId  = pRes.data?.id;
@@ -533,7 +584,8 @@ async function enviarNegocio() {
       } catch(e) { console.warn('Pessoa:', e); }
     }
 
-    const res    = await agendorFetch('/deals', 'POST', payload);
+    const dealEndpoint = orgId ? `/organizations/${orgId}/deals` : '/deals';
+    const res    = await agendorFetch(dealEndpoint, 'POST', payload);
     const dealId = res.data?.id;
 
     const statusLabel = status === '1' ? 'ganho' : status === '2' ? 'perdido' : 'em andamento';
