@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novo Negócio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F5F4F0;
+  --surface: #FFFFFF;
+  --border: #E2E0D8;
+  --border-focus: #1A1A1A;
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B6860;
+  --text-muted: #A8A59E;
+  --accent-bg: #1A1A1A;
+  --accent-text: #FFFFFF;
+  --danger: #C0392B;
+  --danger-bg: #FDF3F2;
+  --danger-border: #F5C6C2;
+  --success: #1D6A45;
+  --success-bg: #F0FAF4;
+  --success-border: #A3D9BC;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 2.5rem 1rem 5rem;
+}
+
+.container { max-width: 700px; margin: 0 auto; }
+
+/* Header */
+.page-header { margin-bottom: 2rem; }
+.header-mark { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+.header-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+.page-header h1 {
+  font-size: 28px; font-weight: 500;
+  letter-spacing: -.03em; color: var(--text-primary);
+  margin-bottom: 5px;
+}
+.page-header p { font-size: 14px; color: var(--text-secondary); font-weight: 300; }
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1rem;
+}
+.card-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.card-header svg { width: 15px; height: 15px; color: var(--text-muted); flex-shrink: 0; }
+.card-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Funil tabs */
+.funnel-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.tab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 99px;
+  border: 1px solid var(--border);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500;
+  cursor: pointer; background: var(--surface);
+  color: var(--text-secondary);
+  transition: all .15s ease; user-select: none;
+}
+.tab:hover { border-color: var(--text-primary); color: var(--text-primary); }
+.tab.active { background: #1A1A1A; color: #FFFFFF; border-color: #1A1A1A; }
+.tab svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* Grid */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+.grid-1 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.mb { margin-bottom: 12px; }
+
+@media (max-width: 520px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+/* Fields */
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label { font-size: 12px; font-weight: 500; color: var(--text-secondary); letter-spacing: .01em; }
+.field label .req { color: var(--danger); margin-left: 2px; }
+
+.field input, .field select, .field textarea {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 400;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  width: 100%; appearance: none; -webkit-appearance: none;
+}
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B6860' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(26,26,26,.07);
+}
+.field input.invalid, .field select.invalid {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(192,57,43,.08) !important;
+}
+.field textarea { resize: vertical; min-height: 84px; line-height: 1.6; }
+.field-hint { font-size: 11px; color: var(--danger); display: none; margin-top: -1px; }
+.field-hint.visible { display: block; }
+
+/* Button */
+.btn-submit {
+  width: 100%; padding: 12px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 500;
+  border-radius: var(--radius); border: none;
+  background: var(--accent-bg); color: var(--accent-text);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity .15s, transform .1s;
+  letter-spacing: -.01em; margin-top: 4px;
+}
+.btn-submit:hover { opacity: .86; }
+.btn-submit:active { transform: scale(.99); }
+.btn-submit:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.btn-submit svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* Messages */
+.msg {
+  margin-top: 12px; padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 13px; line-height: 1.5; display: none;
+}
+.msg.success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); display: block; }
+.msg.error   { background: var(--danger-bg);  color: var(--danger);  border: 1px solid var(--danger-border);  display: block; }
+.msg a { color: inherit; font-weight: 500; }
+
+.spinner {
+  width: 16px; height: 16px; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-mark">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="28" height="28" rx="8" fill="#1A1A1A"/>
+        <path d="M8 14C8 10.686 10.686 8 14 8C17.314 8 20 10.686 20 14" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M8 14C8 17.314 10.686 20 14 20" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2 2"/>
+        <circle cx="14" cy="14" r="2" fill="white"/>
+      </svg>
+      <span class="header-tag">CRM · Agendor</span>
+    </div>
+    <h1>Novo negócio</h1>
+    <p>Preencha os dados abaixo para registrar o negócio no funil correto.</p>
+  </div>
+
+  <!-- 1. Funil -->
+  <div class="card">
+    <div class="card-header">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12"/></svg>
+      <span class="card-title">Funil de destino</span>
+    </div>
+    <div class="funnel-group">
+      <button class="tab active" data-funnel="LGL" onclick="selectFunnel(this)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1M4.22 4.22l.71.71m13.66 13.66.71.71M3 12h1m16 0h1M4.93 19.07l.71-.71M18.36 5.64l.71-.71M9 12a3 3 0 106 0 3 3 0 00-6 0z"/></svg>
+        Legalização
+      </button>
+      <button class="tab" data-funnel="JUR" onclick="selectFunnel(this)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6l9-3 9 3M3 6v12l9 3 9-3V6M12 3v18"/></svg>
+        Jurídico
+      </button>
+      <button class="tab" data-funnel="REG" onclick="selectFunnel(this)">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 4H7a2 2 0 01-2-2V6a2 2 0 012-2h5l5 5v11a2 2 0 01-2 2z"/></svg>
+        Regularização
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. Empresa -->
+  <div class="card">
+    <div class="card-header">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15l.75 18H3.75L4.5 3zM9 9h1.5m4.5 0H13.5M9 13.5h1.5m4.5 0H13.5M9 18h6"/></svg>
+      <span class="card-title">Empresa</span>
+    </div>
+    <div class="grid-3 mb">
+      <div class="field">
+        <label>Razão social <span class="req">*</span></label>
+        <input type="text" id="empresa" placeholder="Nome da empresa">
+      </div>
+      <div class="field">
+        <label>CNPJ</label>
+        <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18">
+      </div>
+    </div>
+    <div class="grid-2 mb">
+      <div class="field">
+        <label>Pessoa responsável</label>
+        <input type="text" id="pessoa" placeholder="Nome do contato na empresa">
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="email" placeholder="contato@empresa.com">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Telefone</label>
+        <input type="tel" id="telefone" placeholder="(00) 00000-0000">
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Negócio -->
+  <div class="card">
+    <div class="card-header">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.073a2.25 2.25 0 01-2.25 2.25h-12a2.25 2.25 0 01-2.25-2.25V6a2.25 2.25 0 012.25-2.25h4.318M16.5 3.75h3.75v3.75M13.5 10.5l6.75-6.75"/></svg>
+      <span class="card-title">Negócio</span>
+    </div>
+    <div class="grid-2 mb">
+      <div class="field">
+        <label>Título do negócio <span class="req">*</span></label>
+        <input type="text" id="titulo" placeholder="Ex: Abertura de empresa — Acme">
+      </div>
+      <div class="field">
+        <label>Responsável pelo negócio</label>
+        <select id="responsavel"><option value="">Carregando...</option></select>
+      </div>
+    </div>
+    <div class="grid-2 mb">
+      <div class="field">
+        <label>Produto / serviço</label>
+        <select id="produtos"><option value="">Carregando...</option></select>
+      </div>
+      <div class="field">
+        <label>Valor do negócio (R$)</label>
+        <input type="number" id="valor" placeholder="0,00" min="0" step="0.01">
+      </div>
+    </div>
+    <div class="grid-2 mb">
+      <div class="field">
+        <label>Status <span class="req">*</span></label>
+        <select id="status_negocio" onchange="onStatusChange()">
+          <option value="0">Em andamento</option>
+          <option value="1">Ganho</option>
+          <option value="2">Perdido</option>
+        </select>
+      </div>
+      <div class="field" id="field_conclusao">
+        <label id="label_conclusao">Data de conclusão</label>
+        <input type="date" id="data_conclusao">
+        <span class="field-hint" id="hint_conclusao">Obrigatória para negócios ganhos ou perdidos.</span>
+      </div>
+    </div>
+    <div class="grid-2 mb">
+      <div class="field">
+        <label>Data de início</label>
+        <input type="date" id="data_inicio">
+      </div>
+    </div>
+    <div class="grid-1">
+      <div class="field">
+        <label>Observações</label>
+        <textarea id="observacoes" placeholder="Informações adicionais sobre o negócio"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-submit" id="btnEnviar" onclick="enviarNegocio()">
+    <svg id="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <span id="btn-label">Criar negócio no Agendor</span>
+  </button>
+  <div class="msg" id="msgBox"></div>
+
+</div>
+<script>
+const API_TOKEN = 'a89b0def-fd5e-45ed-981f-efe89f20159a';
+
+const FUNNELS = {
+  LGL: { label: 'Legalização',    stageIndex: 2 },
+  JUR: { label: 'Jurídico',       stageIndex: 7 },
+  REG: { label: 'Regularização',  stageIndex: 3 },
+};
+
+let selectedFunnel = 'LGL';
+let funnelData = {};
+
+const ICONS = {
+  check:  `<svg id="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+  trophy: `<svg id="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg>`,
+  x:      `<svg id="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+};
+
+// Máscara CNPJ
+document.getElementById('cnpj').addEventListener('input', function(e) {
+  let v = e.target.value.replace(/\D/g, '').slice(0, 14);
+  if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
+  else if (v.length > 8) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
+  else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
+  else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
+  e.target.value = v;
+});
+
+function selectFunnel(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  selectedFunnel = el.dataset.funnel;
+}
+
+function onStatusChange() {
+  const status   = document.getElementById('status_negocio').value;
+  const labelEl  = document.getElementById('label_conclusao');
+  const inputEl  = document.getElementById('data_conclusao');
+  const hintEl   = document.getElementById('hint_conclusao');
+  const btnLabel = document.getElementById('btn-label');
+  const needsDate = status === '1' || status === '2';
+
+  labelEl.innerHTML = needsDate
+    ? 'Data de conclusão <span class="req">*</span>'
+    : 'Data de conclusão';
+  inputEl.classList.remove('invalid');
+  hintEl.classList.remove('visible');
+
+  const iconEl = document.querySelector('.btn-submit svg');
+  if (status === '1') {
+    btnLabel.textContent = 'Criar negócio como ganho';
+    if (iconEl) iconEl.outerHTML = ICONS.trophy;
+  } else if (status === '2') {
+    btnLabel.textContent = 'Criar negócio como perdido';
+    if (iconEl) iconEl.outerHTML = ICONS.x;
+  } else {
+    btnLabel.textContent = 'Criar negócio no Agendor';
+    if (iconEl) iconEl.outerHTML = ICONS.check;
+  }
+}
+
+async function agendorFetch(path, method = 'GET', body = null) {
+  const opts = {
+    method,
+    headers: { 'Authorization': `Token ${API_TOKEN}`, 'Content-Type': 'application/json' },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch('https://api.agendor.com.br/v3' + path, opts);
+  const json = await r.json();
+  if (!r.ok) throw new Error(json.message || JSON.stringify(json));
+  return json;
+}
+
+async function loadFunnels() {
+  try {
+    const res = await agendorFetch('/funnels');
+    (res.data || res).forEach(f => {
+      if (funnelData[f.acronym] !== undefined || ['LGL','JUR','REG'].includes(f.acronym))
+        funnelData[f.acronym] = f;
+    });
+  } catch(e) { console.warn('Funis:', e); }
+}
+
+async function loadUsers() {
+  const sel = document.getElementById('responsavel');
+  try {
+    const res = await agendorFetch('/users');
+    sel.innerHTML = '<option value="">Selecione o responsável</option>';
+    (res.data || res).filter(u => u.active !== false).forEach(u => {
+      const o = document.createElement('option');
+      o.value = u.id; o.textContent = u.name || u.email;
+      sel.appendChild(o);
+    });
+  } catch(e) {
+    sel.innerHTML = '<option value="">Não foi possível carregar</option>';
+  }
+}
+
+async function loadProducts() {
+  const sel = document.getElementById('produtos');
+  try {
+    const res = await agendorFetch('/products');
+    sel.innerHTML = '<option value="">Selecione um produto</option>';
+    (res.data || res).filter(p => p.active !== false).forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.id; o.textContent = p.name;
+      sel.appendChild(o);
+    });
+  } catch(e) {
+    sel.innerHTML = '<option value="">Não foi possível carregar</option>';
+  }
+}
+
+async function buscarOuCriarOrganizacao(nome, cnpj) {
+  try {
+    const search = await agendorFetch(`/organizations?q=${encodeURIComponent(nome)}&per_page=5`);
+    const lista  = search.data || search;
+    if (lista.length > 0) return lista[0].id;
+    const payload = { name: nome };
+    if (cnpj) payload.cnpj = cnpj.replace(/\D/g, '');
+    const created = await agendorFetch('/organizations', 'POST', payload);
+    return created.data?.id || null;
+  } catch(e) {
+    console.warn('Organização:', e);
+    return null;
+  }
+}
+
+async function enviarNegocio() {
+  const btn    = document.getElementById('btnEnviar');
+  const msgBox = document.getElementById('msgBox');
+  msgBox.className = 'msg';
+  msgBox.textContent = '';
+
+  const empresa       = document.getElementById('empresa').value.trim();
+  const titulo        = document.getElementById('titulo').value.trim();
+  const status        = document.getElementById('status_negocio').value;
+  const dataConclusao = document.getElementById('data_conclusao').value;
+
+  let hasError = false;
+
+  ['empresa', 'titulo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) { el.classList.add('invalid'); hasError = true; }
+    else el.classList.remove('invalid');
+  });
+
+  const needsDate = status === '1' || status === '2';
+  const inputConc = document.getElementById('data_conclusao');
+  const hintConc  = document.getElementById('hint_conclusao');
+  if (needsDate && !dataConclusao) {
+    inputConc.classList.add('invalid');
+    hintConc.classList.add('visible');
+    hasError = true;
+  } else {
+    inputConc.classList.remove('invalid');
+    hintConc.classList.remove('visible');
+  }
+
+  if (hasError) {
+    msgBox.className = 'msg error';
+    msgBox.textContent = 'Preencha os campos obrigatórios antes de continuar.';
+    return;
+  }
+
+  btn.disabled = true;
+  const iconEl = btn.querySelector('svg');
+  const savedIcon = iconEl ? iconEl.outerHTML : '';
+  if (iconEl) iconEl.outerHTML = `<div class="spinner"></div>`;
+  document.getElementById('btn-label').textContent = 'Enviando...';
+
+  try {
+    const funil   = funnelData[selectedFunnel];
+    const stages  = funil?.stages || [];
+    const stageId = (stages[FUNNELS[selectedFunnel].stageIndex] || stages[stages.length - 1])?.id;
+
+    const payload = {
+      title:    titulo,
+      status:   parseInt(status),
+      funnelId: funil?.id,
+      stageId,
+    };
+
+    // Organização
+    const cnpj = document.getElementById('cnpj').value.trim();
+    const orgId = await buscarOuCriarOrganizacao(empresa, cnpj);
+    if (orgId) payload.organizationId = orgId;
+
+    // Campos opcionais
+    const valor = document.getElementById('valor').value;
+    if (valor) payload.value = parseFloat(valor);
+
+    const dataInicio = document.getElementById('data_inicio').value;
+    if (dataInicio)    payload.startDate   = dataInicio;
+    if (dataConclusao) payload.closingDate = dataConclusao;
+
+    const responsavelId = document.getElementById('responsavel').value;
+    if (responsavelId) payload.userId = parseInt(responsavelId);
+
+    const produtoId = document.getElementById('produtos').value;
+    if (produtoId) payload.dealProductsAttributes = [{ productId: parseInt(produtoId) }];
+
+    const observacoes = document.getElementById('observacoes').value.trim();
+    if (observacoes) payload.notes = observacoes;
+
+    // Pessoa de contato
+    const pessoa   = document.getElementById('pessoa').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    if (pessoa || telefone || email) {
+      try {
+        const pPayload = { name: pessoa || empresa };
+        if (telefone) pPayload.phone = telefone;
+        if (email)    pPayload.email = email;
+        if (orgId)    pPayload.organizationId = orgId;
+        const pRes = await agendorFetch('/people', 'POST', pPayload);
+        const pId  = pRes.data?.id;
+        if (pId) payload.personId = pId;
+      } catch(e) { console.warn('Pessoa:', e); }
+    }
+
+    const res    = await agendorFetch('/deals', 'POST', payload);
+    const dealId = res.data?.id;
+
+    const statusLabel = status === '1' ? 'ganho' : status === '2' ? 'perdido' : 'em andamento';
+    msgBox.className = 'msg success';
+    msgBox.innerHTML = `Negócio <strong>${titulo}</strong> criado como <strong>${statusLabel}</strong> no funil <strong>${FUNNELS[selectedFunnel].label}</strong>!${dealId ? ` <a href="https://app.agendor.com.br/deals/${dealId}" target="_blank">Ver no Agendor →</a>` : ''}`;
+
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+      if (el.id !== 'status_negocio') el.value = '';
+    });
+    document.getElementById('status_negocio').value = '0';
+    onStatusChange();
+
+  } catch(e) {
+    msgBox.className = 'msg error';
+    msgBox.textContent = 'Erro ao criar negócio: ' + (e.message || 'Tente novamente.');
+  } finally {
+    btn.disabled = false;
+    const spinnerEl = btn.querySelector('.spinner');
+    if (spinnerEl) spinnerEl.outerHTML = savedIcon || ICONS.check;
+    onStatusChange();
+  }
+}
+
+loadFunnels();
+loadUsers();
+loadProducts();
+</script>
+</body>
+</html>
