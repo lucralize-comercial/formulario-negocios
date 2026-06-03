@@ -406,6 +406,14 @@ async function enviarNegocio() {
 
   try {
     const funil = funnelData[selectedFunnel];
+    if (!funil?.id) {
+      msgBox.className = 'msg error';
+      msgBox.textContent = 'Aguarde o carregamento dos funis e tente novamente.';
+      btn.disabled = false;
+      const spinEl = btn.querySelector('.spinner');
+      if (spinEl) spinEl.outerHTML = savedIcon || ICONS.check;
+      return;
+    }
     const statusMap = { '0': 'ongoing', '1': 'won', '2': 'lost' };
 
     // Etapa conforme status
@@ -438,7 +446,7 @@ async function enviarNegocio() {
     if (responsavelId) payload.ownerUser = parseInt(responsavelId);
 
     const produtoId = document.getElementById('produtos').value;
-    if (produtoId) payload.products_entities = [{ id: parseInt(produtoId) }];
+    if (produtoId) payload.products_entities = [{ id: parseInt(produtoId), quantity: 1, price: (valorNum && !isNaN(valorNum)) ? valorNum : 0 }];
 
     const observacoes = document.getElementById('observacoes').value.trim();
     if (observacoes) payload.description = observacoes;
@@ -454,8 +462,8 @@ async function enviarNegocio() {
         const pPayload = { name: pessoa || empresa };
         if (responsavelId) pPayload.ownerUser = parseInt(responsavelId);
         const contact = {};
-        if (telefone) contact.phone = telefone;
-        if (whatsapp) contact.whatsapp = whatsapp;
+        if (telefone) contact.mobilePhone = telefone.replace(/\D/g, '');
+        if (whatsapp) contact.whatsapp = '+55' + whatsapp.replace(/\D/g, '');
         if (email)    contact.email = email;
         if (Object.keys(contact).length) pPayload.contact = contact;
         if (orgId) pPayload.organizationId = orgId;
@@ -467,7 +475,8 @@ async function enviarNegocio() {
 
     const dealEndpoint = orgId ? `/organizations/${orgId}/deals` : '/deals';
     const res    = await agendorFetch(dealEndpoint, 'POST', payload);
-    const dealId = res.data?.id;
+    console.log('Retorno negócio:', JSON.stringify(res));
+    const dealId = res.data?.id || res.id || res.data?.deal?.id || null;
 
     const statusLabel = status === '1' ? 'ganho' : status === '2' ? 'perdido' : 'em andamento';
     const funnelId = funil?.id;
