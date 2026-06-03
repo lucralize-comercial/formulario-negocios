@@ -352,8 +352,10 @@ async function buscarOuCriarOrganizacao(nome, cnpj) {
       if (match) return match.id;
     }
     // Criar nova organização
+    const responsavelIdOrg = document.getElementById('responsavel').value;
     const payload = { name: nome, legalName: nome };
     if (cnpj) payload.cnpj = cnpj.replace(/\D/g, '');
+    if (responsavelIdOrg) payload.ownerUser = parseInt(responsavelIdOrg);
     const created = await agendorFetch('/organizations', 'POST', payload);
     return created.data?.id || null;
   } catch(e) {
@@ -406,6 +408,7 @@ async function enviarNegocio() {
     if (!funnelData[selectedFunnel]?.id) {
       await loadFunnels();
     }
+    console.log('Funil selecionado:', selectedFunnel, funnelData[selectedFunnel]?.name);
     const funil = funnelData[selectedFunnel];
     const statusMap = { '0': 'ongoing', '1': 'won', '2': 'lost' };
 
@@ -473,7 +476,8 @@ async function enviarNegocio() {
     const res    = await agendorFetch(dealEndpoint, 'POST', payload);
     console.log('Retorno negócio:', JSON.stringify(res));
     alert('Retorno: ' + JSON.stringify(res).substring(0, 300));
-    const dealId = res.data?.id || res.id || res.data?.deal?.id || null;
+    const dealId = res?.data?.id || res?.id || null;
+    console.log('Deal ID:', dealId, 'Funil ID:', funil?.id);
 
     const statusLabel = status === '1' ? 'ganho' : status === '2' ? 'perdido' : 'em andamento';
     const funnelId = funil?.id;
