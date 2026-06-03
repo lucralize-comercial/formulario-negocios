@@ -118,11 +118,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     </div>
     <div class="grid-2 mb">
       <div class="field">
-        <label>Pessoa responsável</label>
+        <label>Pessoa responsável <span class="req">*</span></label>
         <input type="text" id="pessoa" placeholder="Nome do contato na empresa">
       </div>
       <div class="field">
-        <label>E-mail</label>
+        <label>E-mail <span class="req">*</span></label>
         <input type="email" id="email" placeholder="contato@empresa.com">
       </div>
     </div>
@@ -132,7 +132,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <input type="tel" id="telefone" placeholder="(00) 00000-0000">
       </div>
       <div class="field">
-        <label>WhatsApp</label>
+        <label>WhatsApp <span class="req">*</span></label>
         <input type="tel" id="whatsapp" placeholder="(00) 00000-0000">
       </div>
     </div>
@@ -150,13 +150,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <input type="text" id="titulo" placeholder="Ex: Abertura de empresa — Acme">
       </div>
       <div class="field">
-        <label>Responsável pelo negócio</label>
+        <label>Responsável pelo negócio <span class="req">*</span></label>
         <select id="responsavel"><option value="">Carregando...</option></select>
       </div>
     </div>
     <div class="grid-2 mb">
       <div class="field">
-        <label>Produto / serviço</label>
+        <label>Produto / serviço <span class="req">*</span></label>
         <select id="produtos"><option value="">Carregando...</option></select>
       </div>
       <div class="field">
@@ -176,7 +176,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     </div>
     <div class="grid-2 mb">
       <div class="field">
-        <label>Data de início</label>
+        <label>Data de início <span class="req">*</span></label>
         <input type="date" id="data_inicio">
       </div>
       <div class="field" id="field_conclusao">
@@ -201,7 +201,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 </div>
 <script>
-const PROXY = 'https://agendo-proxy-production.up.railway.app';
+const PROXY = 'https://web-production-c01f6.up.railway.app/agendor';
 
 const FUNNELS = {
   LGL: { label: 'Legalização' },
@@ -382,6 +382,30 @@ async function enviarNegocio() {
     else el.classList.remove('invalid');
   });
 
+  const produtoEl = document.getElementById('produtos');
+  if (!produtoEl.value) { produtoEl.classList.add('invalid'); hasError = true; }
+  else produtoEl.classList.remove('invalid');
+
+  const responsavelEl = document.getElementById('responsavel');
+  if (!responsavelEl.value) { responsavelEl.classList.add('invalid'); hasError = true; }
+  else responsavelEl.classList.remove('invalid');
+
+  const dataInicioEl = document.getElementById('data_inicio');
+  if (!dataInicioEl.value) { dataInicioEl.classList.add('invalid'); hasError = true; }
+  else dataInicioEl.classList.remove('invalid');
+
+  const whatsappEl = document.getElementById('whatsapp');
+  if (!whatsappEl.value.trim()) { whatsappEl.classList.add('invalid'); hasError = true; }
+  else whatsappEl.classList.remove('invalid');
+
+  const pessoaEl = document.getElementById('pessoa');
+  if (!pessoaEl.value.trim()) { pessoaEl.classList.add('invalid'); hasError = true; }
+  else pessoaEl.classList.remove('invalid');
+
+  const emailEl = document.getElementById('email');
+  if (!emailEl.value.trim()) { emailEl.classList.add('invalid'); hasError = true; }
+  else emailEl.classList.remove('invalid');
+
   const needsDate = status === '1' || status === '2';
   const inputConc = document.getElementById('data_conclusao');
   const hintConc  = document.getElementById('hint_conclusao');
@@ -440,11 +464,15 @@ async function enviarNegocio() {
     const responsavelId = document.getElementById('responsavel').value;
     if (responsavelId) payload.ownerUser = parseInt(responsavelId);
 
-    if (valorNum && !isNaN(valorNum)) payload.value = valorNum;
-
-    const produtoId  = document.getElementById('produtos').value;
+    const produtoId   = document.getElementById('produtos').value;
     const produtoNome = produtoId ? document.getElementById('produtos').options[document.getElementById('produtos').selectedIndex].text : '';
     const observacoes = document.getElementById('observacoes').value.trim();
+
+    // Produto obrigatório — valor sempre vai no produto
+    if (produtoId) {
+      payload.products_entities = [{ id: parseInt(produtoId), quantity: 1, unitValue: (valorNum && !isNaN(valorNum)) ? valorNum : 0 }];
+    }
+
     const descParts = [];
     if (produtoNome) descParts.push('Produto: ' + produtoNome);
     if (observacoes) descParts.push(observacoes);
@@ -461,12 +489,14 @@ async function enviarNegocio() {
         const pPayload = { name: pessoa || empresa };
         if (responsavelId) pPayload.ownerUser = parseInt(responsavelId);
         const contact = {};
-        if (telefone) contact.mobilePhone = telefone.replace(/\D/g, '');
+        if (telefone) contact.work = telefone.replace(/\D/g, '');
         if (whatsapp) contact.whatsapp = '+55' + whatsapp.replace(/\D/g, '');
         if (email)    contact.email = email;
         if (Object.keys(contact).length) pPayload.contact = contact;
-        if (orgId) pPayload.organizationId = orgId;
+        if (orgId) pPayload.organization = orgId;
+        console.log('Payload pessoa:', JSON.stringify(pPayload));
         const pRes = await agendorFetch('/people', 'POST', pPayload);
+        console.log('Retorno pessoa:', JSON.stringify(pRes));
         const pId  = pRes.data?.id;
         if (pId) payload.personId = pId;
       } catch(e) { console.warn('Pessoa:', e); }
@@ -475,8 +505,7 @@ async function enviarNegocio() {
     const dealEndpoint = orgId ? `/organizations/${orgId}/deals` : '/deals';
     const res    = await agendorFetch(dealEndpoint, 'POST', payload);
     console.log('Retorno negócio:', JSON.stringify(res));
-    alert('Retorno: ' + JSON.stringify(res).substring(0, 300));
-    const dealId = res?.data?.id || res?.id || null;
+    const dealId = Array.isArray(res?.data) ? res.data[0]?.id : (res?.data?.id || res?.id || null);
     console.log('Deal ID:', dealId, 'Funil ID:', funil?.id);
 
     const statusLabel = status === '1' ? 'ganho' : status === '2' ? 'perdido' : 'em andamento';
