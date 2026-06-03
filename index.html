@@ -479,6 +479,7 @@ async function enviarNegocio() {
     if (descParts.length) payload.description = descParts.join(' | ');
 
     // Pessoa de contato
+    let pId = null;
     const pessoa   = document.getElementById('pessoa').value.trim();
     const telefone = document.getElementById('telefone').value.trim();
     const email    = document.getElementById('email').value.trim();
@@ -497,12 +498,12 @@ async function enviarNegocio() {
         console.log('Payload pessoa:', JSON.stringify(pPayload));
         const pRes = await agendorFetch('/people', 'POST', pPayload);
         console.log('Retorno pessoa:', JSON.stringify(pRes));
-        const pId  = pRes.data?.id;
+        pId  = pRes.data?.id;
         if (pId) payload.personId = pId;
       } catch(e) { console.warn('Pessoa:', e); }
     }
 
-    const dealEndpoint = orgId ? `/organizations/${orgId}/deals` : '/deals';
+    const dealEndpoint = pId ? `/people/${pId}/deals` : (orgId ? `/organizations/${orgId}/deals` : '/deals');
     const res    = await agendorFetch(dealEndpoint, 'POST', payload);
     console.log('Retorno negócio:', JSON.stringify(res));
     const dealId = Array.isArray(res?.data) ? res.data[0]?.id : (res?.data?.id || res?.id || null);
