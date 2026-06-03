@@ -476,6 +476,7 @@ async function enviarNegocio() {
     const dealEndpoint = orgId ? `/organizations/${orgId}/deals` : '/deals';
     const res    = await agendorFetch(dealEndpoint, 'POST', payload);
     console.log('Retorno negócio:', JSON.stringify(res));
+    alert('Retorno: ' + JSON.stringify(res).substring(0, 300));
     const dealId = res.data?.id || res.id || res.data?.deal?.id || null;
 
     const statusLabel = status === '1' ? 'ganho' : status === '2' ? 'perdido' : 'em andamento';
