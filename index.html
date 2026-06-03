@@ -299,22 +299,19 @@ async function loadFunnels() {
   try {
     const res = await agendorFetch('/funnels');
     for (const f of (res.data || res)) {
-      if (!['LGL','JUR','REG'].includes(f.acronym)) continue;
-      funnelData[f.acronym] = { ...f, stageWon: null, stageLost: null, stageFirst: null };
-      try {
-        const sr = await agendorFetch('/deal_stages?funnel=' + f.id);
-        const stages = sr.data || sr;
-        // Primeira etapa
-        const sorted = [...stages].sort((a, b) => a.sequence - b.sequence);
-        if (sorted.length) funnelData[f.acronym].stageFirst = sorted[0].sequence;
-        // Fechamento
-        const won = stages.find(s => s.name && s.name.toLowerCase().includes('fechamento'));
-        if (won) funnelData[f.acronym].stageWon = won.sequence;
-        // Perdido
-        const lost = stages.find(s => s.name && s.name.toLowerCase().includes('perdido') && !s.name.toLowerCase().includes('sem contato'));
-        if (lost) funnelData[f.acronym].stageLost = lost.sequence;
-      } catch(e) { console.warn('Etapas:', e); }
+      if (!['LGL','JUR','REG'].includes(f.initials)) continue;
+      const stages = f.dealStages || [];
+      const sorted = [...stages].sort((a, b) => a.sequence - b.sequence);
+      const won  = stages.find(s => s.name && s.name.toLowerCase().includes('fechamento'));
+      const lost = stages.find(s => s.name && s.name.toLowerCase().includes('perdido') && !s.name.toLowerCase().includes('sem contato'));
+      funnelData[f.initials] = {
+        ...f,
+        stageFirst: sorted.length ? sorted[0].sequence : null,
+        stageWon:   won  ? won.sequence  : null,
+        stageLost:  lost ? lost.sequence : null,
+      };
     }
+    console.log('Funis carregados:', Object.keys(funnelData));
   } catch(e) { console.warn('Funis:', e); }
 }
 
