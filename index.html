@@ -503,10 +503,11 @@ async function enviarNegocio() {
       } catch(e) { console.warn('Pessoa:', e); }
     }
 
+    console.log('pId:', pId, 'orgId:', orgId);
     const dealEndpoint = pId ? `/people/${pId}/deals` : (orgId ? `/organizations/${orgId}/deals` : '/deals');
     const res    = await agendorFetch(dealEndpoint, 'POST', payload);
     console.log('Retorno negócio:', JSON.stringify(res));
-    const dealId = Array.isArray(res?.data) ? res.data[0]?.id : (res?.data?.id || res?.id || null);
+    const dealId = res?.data?.id || res?.id || null;
     console.log('Deal ID:', dealId, 'Funil ID:', funil?.id);
 
     const statusLabel = status === '1' ? 'ganho' : status === '2' ? 'perdido' : 'em andamento';
