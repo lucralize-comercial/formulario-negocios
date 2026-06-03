@@ -405,15 +405,11 @@ async function enviarNegocio() {
   document.getElementById('btn-label').textContent = 'Enviando...';
 
   try {
-    const funil = funnelData[selectedFunnel];
-    if (!funil?.id) {
-      msgBox.className = 'msg error';
-      msgBox.textContent = 'Aguarde o carregamento dos funis e tente novamente.';
-      btn.disabled = false;
-      const spinEl = btn.querySelector('.spinner');
-      if (spinEl) spinEl.outerHTML = savedIcon || ICONS.check;
-      return;
+    // Aguardar funis se ainda não carregaram
+    if (!funnelData[selectedFunnel]?.id) {
+      await loadFunnels();
     }
+    const funil = funnelData[selectedFunnel];
     const statusMap = { '0': 'ongoing', '1': 'won', '2': 'lost' };
 
     // Etapa conforme status
