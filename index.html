@@ -429,7 +429,6 @@ async function enviarNegocio() {
 
     const valorRaw = document.getElementById('valor').value.replace(/\./g, '').replace(',', '.');
     const valorNum = parseFloat(valorRaw);
-    if (valorNum && !isNaN(valorNum)) payload.value = valorNum;
 
     const dataInicio = document.getElementById('data_inicio').value;
     if (dataInicio)    payload.startTime = dataInicio + 'T00:00:00-03:00';
@@ -438,11 +437,15 @@ async function enviarNegocio() {
     const responsavelId = document.getElementById('responsavel').value;
     if (responsavelId) payload.ownerUser = parseInt(responsavelId);
 
-    const produtoId = document.getElementById('produtos').value;
-    if (produtoId) payload.products_entities = [{ id: parseInt(produtoId), quantity: 1, price: (valorNum && !isNaN(valorNum)) ? valorNum : 0 }];
+    if (valorNum && !isNaN(valorNum)) payload.value = valorNum;
 
+    const produtoId  = document.getElementById('produtos').value;
+    const produtoNome = produtoId ? document.getElementById('produtos').options[document.getElementById('produtos').selectedIndex].text : '';
     const observacoes = document.getElementById('observacoes').value.trim();
-    if (observacoes) payload.description = observacoes;
+    const descParts = [];
+    if (produtoNome) descParts.push('Produto: ' + produtoNome);
+    if (observacoes) descParts.push(observacoes);
+    if (descParts.length) payload.description = descParts.join(' | ');
 
     // Pessoa de contato
     const pessoa   = document.getElementById('pessoa').value.trim();
